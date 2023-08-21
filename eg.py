@@ -111,11 +111,7 @@ def authorize():
     client_config = {
         "web": {
             "client_id": CLIENT_ID,
-            "client_secret": CLIENT_SECRET,
-            "auth_uri": AUTH_URI,
-            "token_uri": TOKEN_URI,
-            "auth_provider_x509_cert_url": AUTH_PROVIDER_X509_CERT_URL,
-            "redirect_uris": REDIRECT_URIS
+            "client_secret": CLIENT_SECRET
         }
     }
     flow = google_auth_oauthlib.flow.Flow.from_client_config(
