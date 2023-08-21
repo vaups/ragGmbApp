@@ -112,8 +112,8 @@ def get_session_value():
 @app.route('/authorize')
 def authorize():
     """Begin the Google OAuth2 authorization flow."""
-    state = generate_random_string(32)
-    flask.session['state'] = state
+    state = secrets.token_hex(32)
+    session['state'] = state
 
     client_config = {
         "web": {
@@ -141,7 +141,7 @@ def authorize():
 
 @app.route('/oauth2callback')
 def oauth2callback():
-    state = flask.session.get('state')
+    state = session.get('state')
     url_state = flask.request.args.get('state')
 
     app.logger.debug(f"State from session: {state}")
@@ -172,8 +172,7 @@ def oauth2callback():
         flask.session['credentials'] = credentials_to_dict(credentials)
         return flask.redirect("https://app.gmb.reedauto.com/")
     except Exception as e:
-        app.logger.error(f"Error fetching token: {e}")
-        return f"Error: {e}", 500
+        app.logger.error
 
 @app.route('/fetch_reviews', methods=['GET'])
 def fetch_reviews():
