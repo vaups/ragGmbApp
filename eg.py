@@ -125,7 +125,6 @@ def authorize():
         access_type='offline',
         include_granted_scopes='true'
     )
-
     flask.session['state'] = state
 
     return flask.jsonify({"authorization_url": authorization_url})
@@ -203,6 +202,28 @@ def fetch_reviews():
         return flask.jsonify(reviews)
     except Exception as e:
         print(f"Error fetching reviews {e}")
+        return f"Error: {e}", 500
+    
+@app.route('/test_redis')
+def test_redis():
+    """Test route to set a key in Redis and then retrieve it."""
+    try:
+        # Connect to Redis
+        r = app.config['SESSION_REDIS']
+
+        # Set a key
+        key_name = "test_key"
+        value = "Hello, Redis!"
+        r.set(key_name, value)
+
+        # Retrieve the key
+        retrieved_value = r.get(key_name)
+
+        # Clean up (optional)
+        r.delete(key_name)
+
+        return f"Set {key_name} to {value}. Retrieved value: {retrieved_value}"
+    except Exception as e:
         return f"Error: {e}", 500
 
 # === UTILITY FUNCTIONS ===
