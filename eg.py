@@ -52,7 +52,8 @@ if 'SECRET_KEY' in os.environ:
     app.secret_key = os.environ['SECRET_KEY']
 else:
     raise ValueError("No SECRET_KEY set for Flask application. Set this environment variable.")
-
+print(f"CLIENT_SECRETS_FILE: {CLIENT_SECRETS_FILE}")
+print(f"PORT: {os.environ.get('PORT', 5000)}")
 # Configure server-side sessions
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_PERMANENT'] = False
