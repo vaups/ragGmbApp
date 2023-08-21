@@ -72,6 +72,8 @@ app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'session:'
 app.config['SESSION_REDIS'] = redis.StrictRedis(host='srv-captain--redis', port=6379, db=0, password=os.environ.get('REDIS_PASSWORD'))
+app.config['SESSION_COOKIE_DOMAIN'] = '.reedauto.com'
+app.config['SESSION_COOKIE_PATH'] = '/'
 Session(app)
 
 # === ROUTES ===
