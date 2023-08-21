@@ -77,6 +77,9 @@ app.config['SESSION_COOKIE_DOMAIN'] = '.reedauto.com'
 app.config['SESSION_COOKIE_PATH'] = '/'
 Session(app)
 
+redis_client = redis.StrictRedis(host='srv-captain--redis', port=6379, db=0, password=os.environ.get('REDIS_PASSWORD'))
+
+
 def generate_random_string(length):
     return secrets.token_hex(length)
 
@@ -112,10 +115,13 @@ def get_session_value():
 @app.route('/authorize')
 def authorize():
     """Begin the Google OAuth2 authorization flow."""
-    state = secrets.token_hex(32)
-
     redis_client = redis.StrictRedis(host='srv-captain--redis', port=6379, db=0, password=os.environ.get('REDIS_PASSWORD'))
+
+    state = generate_random_string(32)
     redis_client.set('state', state)
+
+    next_page = flask.request.args.get('next')
+    flask.session['next_page'] = next_page
 
     client_config = {
         "web": {
@@ -142,6 +148,7 @@ def authorize():
 
 @app.route('/oauth2callback')
 def oauth2callback():
+    """Handle the OAuth2 callback."""
     state = redis_client.get('state')
     url_state = flask.request.args.get('state')
 
@@ -171,16 +178,17 @@ def oauth2callback():
     flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
 
     authorization_response = flask.request.url
+
     try:
         flow.fetch_token(authorization_response=authorization_response)
         credentials = flow.credentials
         flask.session['credentials'] = credentials_to_dict(credentials)
         redis_client.delete('state')
-        return flask.redirect("https://app.gmb.reedauto.com/")
+        return flask.redirect(flask.session['next_page'])
     except Exception as e:
         app.logger.error(f"Error fetching token: {e}")
         return f"Error: {e}", 500
-
+    
 @app.route('/fetch_reviews', methods=['GET'])
 def fetch_reviews():
     """Fetch reviews for a specified location."""
