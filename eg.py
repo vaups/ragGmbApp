@@ -113,6 +113,8 @@ def get_session_value():
 def authorize():
     """Begin the Google OAuth2 authorization flow."""
     state = generate_random_string(32)
+    flask.session['state'] = state
+
     client_config = {
         "web": {
             "client_id": CLIENT_ID,
@@ -133,7 +135,6 @@ def authorize():
         include_granted_scopes='true',
         state=state
     )
-    flask.session['state'] = state
 
     return flask.jsonify({"authorization_url": authorization_url})
 
