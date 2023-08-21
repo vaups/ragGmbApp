@@ -11,6 +11,7 @@ import redis
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
+import secrets
 from flask_cors import CORS
 from flask import Flask, request, session
 from flask_session import Session
@@ -76,6 +77,9 @@ app.config['SESSION_COOKIE_DOMAIN'] = '.reedauto.com'
 app.config['SESSION_COOKIE_PATH'] = '/'
 Session(app)
 
+def generate_random_string(length):
+    return secrets.token_hex(length)
+
 # === ROUTES ===
 
 @app.route('/')
@@ -108,6 +112,7 @@ def get_session_value():
 @app.route('/authorize')
 def authorize():
     """Begin the Google OAuth2 authorization flow."""
+    state = generate_random_string(32)
     client_config = {
         "web": {
             "client_id": CLIENT_ID,
@@ -125,7 +130,8 @@ def authorize():
 
     authorization_url, state = flow.authorization_url(
         access_type='offline',
-        include_granted_scopes='true'
+        include_granted_scopes='true',
+        state=state
     )
     flask.session['state'] = state
 
@@ -163,15 +169,10 @@ def oauth2callback():
         flow.fetch_token(authorization_response=authorization_response)
         credentials = flow.credentials
         flask.session['credentials'] = credentials_to_dict(credentials)
+        return flask.redirect("https://app.gmb.reedauto.com/")
     except Exception as e:
         app.logger.error(f"Error fetching token: {e}")
         return f"Error: {e}", 500
-
-    if 'credentials' in flask.session:
-        # Redirect to frontend main page after successful authentication
-        return flask.redirect("https://app.gmb.reedauto.com/")
-    else:
-        return flask.jsonify({"status": "error", "message": "Error fetching token"})
 
 @app.route('/fetch_reviews', methods=['GET'])
 def fetch_reviews():
