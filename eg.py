@@ -1,29 +1,34 @@
-# -*- coding: utf-8 -*-
+# === IMPORTS ===
 
+# Standard Libraries
 import os
+import logging
+
+# Third-party Libraries
 import flask
 import requests
 import redis
-import logging
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
-
 from flask_cors import CORS
-from flask import request
+from flask import Flask, request, session
 from flask_session import Session
+
+# === CONFIGURATION ===
 
 logging.basicConfig(level=logging.DEBUG)
 
-# Use environment variable for client secrets file or default to 'client_secret.json'
+# ENV Variables
 CLIENT_SECRETS_FILE = os.environ.get('CLIENT_SECRETS_FILE')
 CLIENT_ID = os.environ.get('CLIENT_ID')
 CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
 AUTH_URI = os.environ.get('AUTH_URI')
 TOKEN_URI = os.environ.get('TOKEN_URI')
 AUTH_PROVIDER_X509_CERT_URL = os.environ.get('AUTH_PROVIDER_X509_CERT_URL')
-REDIRECT_URIS = os.environ.get('REDIRECT_URIS').split(",")  # Assuming you store them comma-separated
+REDIRECT_URIS = os.environ.get('REDIRECT_URIS').split(",")
 
+# Dictionary of Locations for GMB
 LOCATIONS = {
     "Reed Jeep Chrysler Dodge Ram of Kansas City Service Center": ("107525660123223074874", "6602925040958900944"),
     "Reed Jeep of Kansas City": ("107525660123223074874", "1509419292313302599"),
@@ -45,31 +50,62 @@ LOCATIONS = {
     "Reed Buick GMC Collision Center": ("109231983509135903650", "10315051056232587965")
 }
 
-SCOPES = [
-    "https://www.googleapis.com/auth/business.manage"
-]
+# Google API Config
+SCOPES = ["https://www.googleapis.com/auth/business.manage"]
 API_SERVICE_NAME = 'mybusiness'
 API_VERSION = 'v4'
 
+# === APP INITIALIZATION ===
+
 app = flask.Flask(__name__)
-CORS(app) #allow all origins
+CORS(app)
+
+# App Secret
 if 'SECRET_KEY' in os.environ:
     app.secret_key = os.environ['SECRET_KEY']
 else:
     raise ValueError("No SECRET_KEY set for Flask application. Set this environment variable.")
 
-# Configure server-side sessions
+# Redis Session Configuration
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'session:'
 app.config['SESSION_REDIS'] = redis.StrictRedis(host='srv-captain--redis', port=6379, db=0, password=os.environ.get('REDIS_PASSWORD'))
-
 Session(app)
+
+# === ROUTES ===
+
+@app.route('/')
+def index():
+    """Home route to start the authentication flow."""
+    return '''
+        <html>
+            <head>
+                <title>Google My Business API Integration</title>
+            </head>
+            <body>
+                <h2>Welcome to the Google My Business API Integration</h2>
+                <p>Click the button below to start the authentication flow:</p>
+                <button onclick="location.href='/authorize'" type="button">Start Authentication</button>
+            </body>
+        </html>
+    '''
+
+@app.route('/set/')
+def set_session_value():
+    """Test route to set a session value."""
+    session['key'] = 'value'
+    return 'Key set.'
+
+@app.route('/get/')
+def get_session_value():
+    """Test route to retrieve a session value."""
+    return session.get('key', 'Not set')
 
 @app.route('/authorize')
 def authorize():
-    # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
+    """Begin the Google OAuth2 authorization flow."""
     client_config = {
         "web": {
             "client_id": CLIENT_ID,
@@ -97,6 +133,7 @@ def authorize():
 
 @app.route('/oauth2callback')
 def oauth2callback():
+    """Handle the OAuth2 callback after user authorizes."""
     state = flask.session.get('state')
     url_state = flask.request.args.get('state')
 
@@ -135,34 +172,9 @@ def oauth2callback():
     else:
         return flask.jsonify({"status": "error", "message": "Error fetching token"})
 
-
-def credentials_to_dict(credentials):
-    return {
-        'token': credentials.token,
-        'refresh_token': credentials.refresh_token,
-        'token_uri': credentials.token_uri,
-        'client_id': credentials.client_id,
-        'client_secret': credentials.client_secret,
-        'scopes': credentials.scopes
-    }
-
-@app.route('/')
-def index():
-    return '''
-        <html>
-            <head>
-                <title>Google My Business API Integration</title>
-            </head>
-            <body>
-                <h2>Welcome to the Google My Business API Integration</h2>
-                <p>Click the button below to start the authentication flow:</p>
-                <button onclick="location.href='/authorize'" type="button">Start Authentication</button>
-            </body>
-        </html>
-    '''
-
 @app.route('/fetch_reviews', methods=['GET'])
 def fetch_reviews():
+    """Fetch reviews for a specified location."""
     location_name = request.args.get('location_name')
     if not location_name or location_name not in LOCATIONS:
         return flask.jsonify({"error": "Invalid location name"}), 400
@@ -192,6 +204,21 @@ def fetch_reviews():
     except Exception as e:
         print(f"Error fetching reviews {e}")
         return f"Error: {e}", 500
+
+# === UTILITY FUNCTIONS ===
+
+def credentials_to_dict(credentials):
+    """Convert Google OAuth2 credentials to a dictionary."""
+    return {
+        'token': credentials.token,
+        'refresh_token': credentials.refresh_token,
+        'token_uri': credentials.token_uri,
+        'client_id': credentials.client_id,
+        'client_secret': credentials.client_secret,
+        'scopes': credentials.scopes
+    }
+
+# === MAIN EXECUTION ===
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
