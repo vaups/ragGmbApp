@@ -18,6 +18,12 @@ logging.basicConfig(level=logging.DEBUG)
 
 # Use environment variable for client secrets file or default to 'client_secret.json'
 CLIENT_SECRETS_FILE = os.environ.get('CLIENT_SECRETS_FILE')
+CLIENT_ID = os.environ.get('CLIENT_ID')
+CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
+AUTH_URI = os.environ.get('AUTH_URI')
+TOKEN_URI = os.environ.get('TOKEN_URI')
+AUTH_PROVIDER_X509_CERT_URL = os.environ.get('AUTH_PROVIDER_X509_CERT_URL')
+REDIRECT_URIS = os.environ.get('REDIRECT_URIS').split(",")  # Assuming you store them comma-separated
 
 LOCATIONS = {
     "Reed Jeep Chrysler Dodge Ram of Kansas City Service Center": ("107525660123223074874", "6602925040958900944"),
@@ -52,8 +58,7 @@ if 'SECRET_KEY' in os.environ:
     app.secret_key = os.environ['SECRET_KEY']
 else:
     raise ValueError("No SECRET_KEY set for Flask application. Set this environment variable.")
-print(f"CLIENT_SECRETS_FILE: {'SECRET_KEY'}")
-print(f"PORT: {os.environ.get('PORT', 5000)}")
+
 # Configure server-side sessions
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_PERMANENT'] = False
@@ -66,8 +71,18 @@ Session(app)
 @app.route('/authorize')
 def authorize():
     # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
-    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE, scopes=SCOPES)
+    client_config = {
+        "web": {
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+            "auth_uri": AUTH_URI,
+            "token_uri": TOKEN_URI,
+            "auth_provider_x509_cert_url": AUTH_PROVIDER_X509_CERT_URL,
+            "redirect_uris": REDIRECT_URIS
+        }
+    }
+    flow = google_auth_oauthlib.flow.Flow.from_client_config(
+        client_config, scopes=SCOPES)
 
     flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
 
@@ -91,12 +106,20 @@ def oauth2callback():
 
     if state != url_state:
         app.logger.error("State mismatch error!")
-        print("State from session:", state)
-        print("State from URL:", url_state)
         return "State mismatch error!", 400
 
-    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
+    client_config = {
+        "web": {
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+            "auth_uri": AUTH_URI,
+            "token_uri": TOKEN_URI,
+            "auth_provider_x509_cert_url": AUTH_PROVIDER_X509_CERT_URL,
+            "redirect_uris": REDIRECT_URIS
+        }
+    }
+    flow = google_auth_oauthlib.flow.Flow.from_client_config(
+        client_config, scopes=SCOPES, state=state)
     flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
 
     authorization_response = flask.request.url
