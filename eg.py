@@ -133,7 +133,6 @@ def authorize():
 
 @app.route('/oauth2callback')
 def oauth2callback():
-    """Handle the OAuth2 callback after user authorizes."""
     state = flask.session.get('state')
     url_state = flask.request.args.get('state')
 
@@ -168,7 +167,8 @@ def oauth2callback():
         return f"Error: {e}", 500
 
     if 'credentials' in flask.session:
-        return flask.jsonify({"status": "success"})
+        # Redirect to frontend main page after successful authentication
+        return flask.redirect("https://app.gmb.reedauto.com/")
     else:
         return flask.jsonify({"status": "error", "message": "Error fetching token"})
 
