@@ -113,7 +113,9 @@ def get_session_value():
 def authorize():
     """Begin the Google OAuth2 authorization flow."""
     state = secrets.token_hex(32)
-    session['state'] = state
+
+    redis_client = redis.StrictRedis(host='srv-captain--redis', port=6379, db=0, password=os.environ.get('REDIS_PASSWORD'))
+    redis_client.set('state', state)
 
     client_config = {
         "web": {
@@ -138,14 +140,17 @@ def authorize():
 
     return flask.jsonify({"authorization_url": authorization_url})
 
-
 @app.route('/oauth2callback')
 def oauth2callback():
-    state = session.get('state')
+    state = redis_client.get('state')
     url_state = flask.request.args.get('state')
 
-    app.logger.debug(f"State from session: {state}")
+    app.logger.debug(f"State from Redis: {state}")
     app.logger.debug(f"State from URL: {url_state}")
+
+    if state is None:
+        app.logger.error("State not found in Redis!")
+        return "State not found in Redis!", 400
 
     if state != url_state:
         app.logger.error("State mismatch error!")
@@ -170,9 +175,11 @@ def oauth2callback():
         flow.fetch_token(authorization_response=authorization_response)
         credentials = flow.credentials
         flask.session['credentials'] = credentials_to_dict(credentials)
+        redis_client.delete('state')
         return flask.redirect("https://app.gmb.reedauto.com/")
     except Exception as e:
-        app.logger.error
+        app.logger.error(f"Error fetching token: {e}")
+        return f"Error: {e}", 500
 
 @app.route('/fetch_reviews', methods=['GET'])
 def fetch_reviews():
