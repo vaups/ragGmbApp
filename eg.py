@@ -62,7 +62,7 @@ else:
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
-app.config['SESSION_KEY_PREFIX'] = 'gmb:'
+app.config['SESSION_KEY_PREFIX'] = 'session:'
 app.config['SESSION_REDIS'] = redis.StrictRedis(host='srv-captain--redis', port=6379, db=0, password=os.environ.get('REDIS_PASSWORD'))
 
 Session(app)
