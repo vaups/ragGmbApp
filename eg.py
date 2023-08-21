@@ -149,7 +149,7 @@ def authorize():
 @app.route('/oauth2callback')
 def oauth2callback():
     """Handle the OAuth2 callback."""
-    state = redis_client.get('state')
+    state = redis_client.get('state').decode()
     url_state = flask.request.args.get('state')
 
     app.logger.debug(f"State from Redis: {state}")
