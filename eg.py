@@ -17,7 +17,7 @@ from flask_session import Session
 logging.basicConfig(level=logging.DEBUG)
 
 # Use environment variable for client secrets file or default to 'client_secret.json'
-CLIENT_SECRETS_FILE = os.environ.get('CLIENT_SECRETS_FILE', 'client_secret.json')
+CLIENT_SECRETS_FILE = os.environ.get('CLIENT_SECRETS_FILE')
 
 LOCATIONS = {
     "Reed Jeep Chrysler Dodge Ram of Kansas City Service Center": ("107525660123223074874", "6602925040958900944"),
@@ -58,7 +58,7 @@ app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'gmb:'
-app.config['SESSION_REDIS'] = redis.StrictRedis(host='localhost', port=6379, db=0)  # Adjust as per your Redis configuration
+app.config['SESSION_REDIS'] = redis.StrictRedis(host='srv-captain--redis', port=6379, db=0, password=os.environ.get('REDIS_PASSWORD'))
 
 Session(app)
 
@@ -171,5 +171,4 @@ def fetch_reviews():
         return f"Error: {e}", 500
 
 if __name__ == '__main__':
-    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
