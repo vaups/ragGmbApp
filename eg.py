@@ -121,6 +121,8 @@ def authorize():
     redis_client.set('state', state)
 
     next_page = flask.request.args.get('next')
+    if next_page is None:
+        next_page = 'https://app.gmb.reedauto.com/'
     flask.session['next_page'] = next_page
 
     client_config = {
