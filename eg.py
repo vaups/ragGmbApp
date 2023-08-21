@@ -172,12 +172,12 @@ def oauth2callback():
             "auth_uri": AUTH_URI,
             "token_uri": TOKEN_URI,
             "auth_provider_x509_cert_url": AUTH_PROVIDER_X509_CERT_URL,
-            "redirect_uris": REDIRECT_URIS
+            "redirect_uris": ['https://backend.gmb.reedauto.com/oauth2callback']
         }
     }
     flow = google_auth_oauthlib.flow.Flow.from_client_config(
         client_config, scopes=SCOPES, state=state)
-    flow.redirect_uri = flask.url_for('oauth2callback', _external=True).replace('http://', 'https://')
+    flow.redirect_uri = 'https://backend.gmb.reedauto.com/oauth2callback'
 
     authorization_response = flask.request.url
 
