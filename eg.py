@@ -175,7 +175,7 @@ def oauth2callback():
     }
     flow = google_auth_oauthlib.flow.Flow.from_client_config(
         client_config, scopes=SCOPES, state=state)
-    flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
+    flow.redirect_uri = flask.url_for('oauth2callback', _external=True).replace('http://', 'https://')
 
     authorization_response = flask.request.url
 
