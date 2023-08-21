@@ -5,7 +5,6 @@ import flask
 import requests
 import redis
 import logging
-
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
