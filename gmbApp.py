@@ -112,11 +112,11 @@ def fetch_reviews():
     if not session.get('is_authenticated'):
         return jsonify({"message": "Not authenticated"}), 401
 
-    location_name = request.args.get('location_name')
-    if not location_name or location_name not in LOCATIONS:
+    location_id = request.args.get('location_id')
+    if not location_id or location_id not in LOCATIONS:
         return jsonify({"error": "Invalid location name"}), 400
 
-    account_id, location_id = LOCATIONS[location_name]
+    account_id = request.args.get('account_id')
 
     # Use the local discovery document
     with open('mybusiness_google_rest_v4p9.json', 'r') as f:
