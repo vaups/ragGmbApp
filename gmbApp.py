@@ -52,7 +52,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "https://app.gmb.reedauto.com/"}})  # Update this to your frontend domain
 
 # Load the service account credentials
-with open("sa_secret.json", "r") as f:
+with open("rag-marketing-ef5a641c05a9.json", "r") as f:
     SERVICE_ACCOUNT_INFO = json.load(f)
 
 # Initialize the service account credentials

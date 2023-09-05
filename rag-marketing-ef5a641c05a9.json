@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "rag-marketing",
+  "private_key_id": "ef5a641c05a9ad2f681d26301f83a4d16bebeea1",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCIQblHqJGnwzrU\n34EN9E65mHTl7NNIJUBqYZkWA6WDl+M9kw0/HTi5Sh/BvvkovKm/AV+UcKQePpGQ\n/VefgIV3JxKSgdOg45vUXqClHGk3TW3fLGK/erFgfUb623mFBNMY9V61E718xlBw\nk88daOFyn+lNbaKpZ21WHpejih2nM0+9amKvX93pvAFKZ1y6Y5ukvfRJ5ygbjenr\nD4v/UTX+4IMIqj4E5D14PURgKHqTkgiL2xOJDiJN/YhbKhoM4xGD3NRIMXAk7YWJ\njRoUOJCeWWHwtA1yuFfWIkjrWQxzwykl1MhlnZPdTB648MFbdJcgIm5iXdFmy+UQ\no5YrkgPjAgMBAAECggEAJLCF4nzKk8DnI5D3YDmLxT//IjZuAfw95ydWoG3k8JVC\nlD73jyogLwx9lp8E2mpKzurgwMi/+IDik4cURBfIWHhF8PtSb/055aqBWVRYJJMN\n5c0+3c582r2BEmVsyFuvOAZCNUIWgPWpjVbPq1ylcEcM/FNsPG9kKo9cR6YWLAIp\nfmOlo+SmJ7D9jB9b7IivOdv93nEIv1M8hb2dJ6qeRIDzc7LU1XUgxd8ttxklgFAj\np9YbW5fy8UBwKN9tyf53s+4aver3zqY6Rf1hY26CJZVFeXfKZTK3Hrh0raUnV+ZP\nTcUwQ0QzBVqtJFjkUebZkGlS5Sqfxh0mxpY4RrTeiQKBgQC7kR8QGXWrB0ejhX/J\nEsnol+PxFJKF4kSNCO4v21StGPt/8IdfDu0eUxU/4jKvP82eKGZjm5JsBv8lL+/h\niDHB3bOcyachbH5LPJcoa5eZbug8tywL8EBi65mUAa7Jvqh636L5ypyzxplON44p\nsy5K4cBI7tba93HMZMcizRSwtQKBgQC5+DLVt+3LtThzORNi6ebZf+a1uL+TDx2k\nTNqvSfubdwCILxiiz9AuqtYeXjT6D6nW+Lu9AKgb+yHv924O5HZUyw3rfkiJvUPE\nSQyGg8w3WOGwCxOxaxFRLCslqFCUif7LwCykZhrwkyQ4hKnEZiaJLr8sZJPnSzPJ\nJjmv80D5NwKBgQCIE57PlUjyzZNBpQayH/lvz1JFgsFSdHd7QnFbMupZsngzt5Le\nefu5NlmCQV64GbfY+EJgHWu7B9BvcDm+C4rdtTQrmXixHP77IngfkP8pB3dhJRrF\nhoWPvpFq+VWPc8zTaA/a3Q2Wt4xdXJy80AvTs7hGsVAbB839lVeLffF2yQKBgFbH\nwUEFwUuL1zm9apR/vZ/FFW27NnpzVUu0KWAez/BuCauC/qYK/4SnZ59oKqR95q1Q\nCJtb0Rati9qkxZDhf252CprXpRXRYewYgmXK3uL88OPrZ1clNUGBsOizsFaARovh\ns3NLykp0/zP4hBgH6vec/szCalpGN3YoBkda5fjlAoGBAIPgPyEYHgSw9/dsoyFR\nEQ05/Bb0HtovYKYlZpgcgGLGwCsykKwuL+52QMYf6qnUA+ls3kaJrBEoFZhF3hNc\n0ZFtidv3oPF6dgibboxUk85SbbEhZBmJkU4OWe8YdzCJHJ7Fga3/NsuFP01f0Jkc\nIa/q1mguZIzpYlhku+Xjb2si\n-----END PRIVATE KEY-----\n",
+  "client_email": "gmb-reviewapp@rag-marketing.iam.gserviceaccount.com",
+  "client_id": "104932725395526063396",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/gmb-reviewapp%40rag-marketing.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
