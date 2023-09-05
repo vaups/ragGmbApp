@@ -172,7 +172,7 @@ def oauth2callback():
             "auth_uri": AUTH_URI,
             "token_uri": TOKEN_URI,
             "auth_provider_x509_cert_url": AUTH_PROVIDER_X509_CERT_URL,
-            "redirect_uris": ['https://backend.gmb.reedauto.com/oauth2callback']
+            "redirect_uris": REDIRECT_URIS
         }
     }
     flow = google_auth_oauthlib.flow.Flow.from_client_config(
