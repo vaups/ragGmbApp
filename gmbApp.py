@@ -100,7 +100,7 @@ def login():
     password = request.json.get('password')
 
     # Replace with your actual authentication logic
-    if username == "your_username" and password == "your_password":
+    if username == os.environ.get('SECRET_USERNAME') and password == os.environ.get('SECRET_PASSWORD'):
         session['is_authenticated'] = True
         return jsonify({"message": "Logged in successfully"}), 200
     else:
