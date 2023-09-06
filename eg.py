@@ -232,6 +232,13 @@ def fetch_reviews():
         app.logger.error(f"Exception occurred: {e}")
         app.logger.exception("Exception details:")
         return f"Error: {e}", 500
+
+@app.route('/check_auth')
+def check_auth():
+    if 'credentials' in flask.session:
+        return flask.jsonify({"isAuthenticated": True})
+    else:
+        return flask.jsonify({"isAuthenticated": False})
     
 @app.route('/test_redis')
 def test_redis():
