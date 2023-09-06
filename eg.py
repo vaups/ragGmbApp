@@ -181,7 +181,8 @@ def oauth2callback():
     try:
         flow.fetch_token(authorization_response=authorization_response)
     except Exception as e:
-        app.logger.error(f"Error fetching token: {e}")
+        app.logger.error(f"Exception occurred: {e}")
+        app.logger.exception("Exception details:")
         return f"Error: {e}", 500
 
     # Store credentials in session
@@ -225,7 +226,8 @@ def fetch_reviews():
         flask.session['credentials'] = credentials_to_dict(credentials)
         return flask.jsonify(reviews)
     except Exception as e:
-        print(f"Error fetching reviews {e}")
+        app.logger.error(f"Exception occurred: {e}")
+        app.logger.exception("Exception details:")
         return f"Error: {e}", 500
     
 @app.route('/test_redis')
