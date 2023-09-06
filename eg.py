@@ -137,8 +137,7 @@ def authorize():
     }
     flow = google_auth_oauthlib.flow.Flow.from_client_config(
         client_config, scopes=SCOPES)
-
-    flow.redirect_uri = os.environ.get('REDIRECT_URI')
+    flow.redirect_uri = flask.url_for('oauth2callback', _external=True, _scheme='https')
 
     authorization_url, state = flow.authorization_url(
         access_type='offline',
@@ -172,7 +171,7 @@ def oauth2callback():
 
     flow = google_auth_oauthlib.flow.Flow.from_client_config(
         client_config, scopes=SCOPES, state=state)
-    flow.redirect_uri = os.environ.get('REDIRECT_URI')
+    flow.redirect_uri = 'https://backend.gmb.reedauto.com/oauth2callback'
 
     # Now, use the authorization_response to fetch the access token
     authorization_response = flask.request.url
