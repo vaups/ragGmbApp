@@ -116,7 +116,6 @@ def get_session_value():
 
 @app.route('/authorize')
 def authorize():
-    next_page = flask.request.args.get('next_page', 'https://app.gmb.reedauto.com/')
     """Begin the Google OAuth2 authorization flow."""
     redis_client = redis.StrictRedis(host='srv-captain--redis', port=6379, db=0, password=os.environ.get('REDIS_PASSWORD'))
 
@@ -154,7 +153,6 @@ def authorize():
 @app.route('/oauth2callback')
 def oauth2callback():
     # Retrieve state and validate
-    next_page = flask.request.args.get('next_page', 'https://app.gmb.reedauto.com/')
     state = redis_client.get('state').decode()
     url_state = flask.request.args.get('state')
 
