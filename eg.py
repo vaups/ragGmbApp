@@ -15,6 +15,7 @@ import secrets
 from flask_cors import CORS
 from flask import Flask, request, session
 from flask_session import Session
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 # === CONFIGURATION ===
 
@@ -60,6 +61,7 @@ API_VERSION = 'v4'
 
 app = flask.Flask(__name__)
 CORS(app)
+app.wsgi_app = ProxyFix(app.wsgi_app)
 
 # App Secret
 if 'SECRET_KEY' in os.environ:
