@@ -150,10 +150,13 @@ def authorize():
 
 @app.route('/oauth2callback')
 def oauth2callback():
-    # Retrieve state and validate
-    state = redis_client.get('state')
-    if state is not None:
-        state = state.decode()
+    # Retrieve state from Redis and validate
+    stored_state = redis_client.get('state')
+    if stored_state is not None:
+        stored_state = stored_state.decode()
+    url_state = flask.request.args.get('state')
+
+    if stored_state is None or stored_state != url_state:
         app.logger.error("Invalid state")
         return "Invalid state", 400
 
@@ -170,7 +173,7 @@ def oauth2callback():
     }
 
     flow = google_auth_oauthlib.flow.Flow.from_client_config(
-        client_config, scopes=SCOPES, state=state)
+        client_config, scopes=SCOPES, state=stored_state)
     flow.redirect_uri = 'https://backend.gmb.reedauto.com/oauth2callback'
 
     # Now, use the authorization_response to fetch the access token
@@ -192,7 +195,9 @@ def oauth2callback():
     # Redirect to the original destination
     next_page = flask.session.get('next_page', 'https://app.gmb.reedauto.com/')
     app.logger.debug(f"Next page from session: {next_page}")
+
     return flask.redirect(next_page)
+
     
 @app.route('/fetch_reviews', methods=['GET'])
 def fetch_reviews():
