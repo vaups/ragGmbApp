@@ -122,9 +122,7 @@ def authorize():
     state = generate_random_string(32)
     redis_client.set('state', state)
 
-    next_page = flask.request.args.get('next')
-    if next_page is None:
-        next_page = 'https://app.gmb.reedauto.com/'
+    next_page = flask.request.args.get('next', 'https://app.gmb.reedauto.com/')
     app.logger.debug(f"Setting next_page to {next_page}")
     flask.session['next_page'] = next_page
 
@@ -153,10 +151,9 @@ def authorize():
 @app.route('/oauth2callback')
 def oauth2callback():
     # Retrieve state and validate
-    state = redis_client.get('state').decode()
-    url_state = flask.request.args.get('state')
-
-    if state is None or state != url_state:
+    state = redis_client.get('state')
+    if state is not None:
+        state = state.decode()
         app.logger.error("Invalid state")
         return "Invalid state", 400
 
@@ -193,8 +190,9 @@ def oauth2callback():
     redis_client.delete('state')
 
     # Redirect to the original destination
-    app.logger.debug(f"Next page from session: {flask.session.get('next_page', 'Not Set')}")
-    return flask.redirect(flask.session['next_page'])
+    next_page = flask.session.get('next_page', 'https://app.gmb.reedauto.com/')
+    app.logger.debug(f"Next page from session: {next_page}")
+    return flask.redirect(next_page)
     
 @app.route('/fetch_reviews', methods=['GET'])
 def fetch_reviews():
