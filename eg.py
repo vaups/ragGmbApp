@@ -60,7 +60,7 @@ API_VERSION = 'v4'
 # === APP INITIALIZATION ===
 
 app = flask.Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True, origins=["https://app.gmb.reedauto.com"])
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
 # App Secret
