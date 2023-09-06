@@ -125,6 +125,7 @@ def authorize():
     next_page = flask.request.args.get('next')
     if next_page is None:
         next_page = 'https://app.gmb.reedauto.com/'
+    app.logger.debug(f"Setting next_page to {next_page}")
     flask.session['next_page'] = next_page
 
     client_config = {
@@ -191,6 +192,7 @@ def oauth2callback():
     redis_client.delete('state')
 
     # Redirect to the original destination
+    app.logger.debug(f"Next page from session: {flask.session.get('next_page', 'Not Set')}")
     return flask.redirect(flask.session['next_page'])
     
 @app.route('/fetch_reviews', methods=['GET'])
