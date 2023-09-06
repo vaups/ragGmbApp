@@ -150,21 +150,15 @@ def authorize():
 
 @app.route('/oauth2callback')
 def oauth2callback():
-    """Handle the OAuth2 callback."""
+    # Retrieve state and validate
     state = redis_client.get('state').decode()
     url_state = flask.request.args.get('state')
 
-    app.logger.debug(f"State from Redis: {state}")
-    app.logger.debug(f"State from URL: {url_state}")
+    if state is None or state != url_state:
+        app.logger.error("Invalid state")
+        return "Invalid state", 400
 
-    if state is None:
-        app.logger.error("State not found in Redis!")
-        return "State not found in Redis!", 400
-
-    if state != url_state:
-        app.logger.error("State mismatch error!")
-        return "State mismatch error!", 400
-
+    # Initialize the same OAuth2 flow as in /authorize
     client_config = {
         "web": {
             "client_id": CLIENT_ID,
@@ -175,21 +169,28 @@ def oauth2callback():
             "redirect_uris": REDIRECT_URIS
         }
     }
+
     flow = google_auth_oauthlib.flow.Flow.from_client_config(
         client_config, scopes=SCOPES, state=state)
     flow.redirect_uri = 'https://backend.gmb.reedauto.com/oauth2callback'
 
+    # Now, use the authorization_response to fetch the access token
     authorization_response = flask.request.url
-
     try:
         flow.fetch_token(authorization_response=authorization_response)
-        credentials = flow.credentials
-        flask.session['credentials'] = credentials_to_dict(credentials)
-        redis_client.delete('state')
-        return flask.redirect(flask.session['next_page'])
     except Exception as e:
         app.logger.error(f"Error fetching token: {e}")
         return f"Error: {e}", 500
+
+    # Store credentials in session
+    credentials = flow.credentials
+    flask.session['credentials'] = credentials_to_dict(credentials)
+
+    # Delete the state in Redis to complete the flow
+    redis_client.delete('state')
+
+    # Redirect to the original destination
+    return flask.redirect(flask.session['next_page'])
     
 @app.route('/fetch_reviews', methods=['GET'])
 def fetch_reviews():
