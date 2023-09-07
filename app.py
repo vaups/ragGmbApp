@@ -191,7 +191,9 @@ def oauth2callback():
     next_page = flask.session.get('next_page', 'https://app.gmb.reedauto.com/')
     app.logger.debug(f"Next page from session: {next_page}")
 
-    return flask.redirect(next_page)
+    app.logger.debug(f"Storing credentials in session: {credentials_to_dict(credentials)}")
+    flask.session['credentials'] = credentials_to_dict(credentials)
+    return flask.redirect(flask.session.get('next_page') or '/')
 
 @app.route('/check_auth')
 def check_auth():
