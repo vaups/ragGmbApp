@@ -16,6 +16,7 @@ from flask_cors import CORS
 from flask import Flask, request, session
 from flask_session import Session
 from werkzeug.middleware.proxy_fix import ProxyFix
+import json
 
 # === CONFIGURATION ===
 
@@ -231,6 +232,7 @@ def fetch_reviews():
 
         reviews = response.get('reviews', [])
         flask.session['credentials'] = credentials_to_dict(credentials)
+        app.logger.debug(f"Sending reviews: {json.dumps(reviews)}")
         return flask.jsonify(reviews)
 
     except Exception as e:
