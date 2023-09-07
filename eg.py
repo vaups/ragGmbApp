@@ -202,36 +202,33 @@ def oauth2callback():
 @app.route('/fetch_reviews', methods=['GET'])
 def fetch_reviews():
     """Fetch reviews for a specified location."""
-    location_name = request.args.get('location_name')
-    if not location_name or location_name not in LOCATIONS:
-        return flask.jsonify({"error": "Invalid location name"}), 400
-
-    account_id, location_id = LOCATIONS[location_name]
-
-    if 'credentials' not in flask.session:
-        return flask.redirect('authorize')
-
-    credentials = google.oauth2.credentials.Credentials(
-        **flask.session['credentials'])
-
-    # Use the local discovery document
-    with open('mybusiness_google_rest_v4p9.json', 'r') as f:
-        discovery_service = f.read()
-
-    service = googleapiclient.discovery.build_from_document(
-        discovery_service, credentials=credentials)
-
     try:
-        response = service.accounts().locations().reviews().list(
-            parent=f'accounts/{account_id}/locations/{location_id}'
-        ).execute()
+        location_name = request.args.get('location_name')
+        if not location_name or location_name not in LOCATIONS:
+            return flask.jsonify({"error": "Invalid location name"}), 400
+
+        if 'credentials' not in flask.session:
+            return flask.jsonify({"error": "Not authenticated", "authorization_url": "/authorize"}), 401
+
+        account_id, location_id = LOCATIONS[location_name]
+        credentials = google.oauth2.credentials.Credentials(**flask.session['credentials'])
+
+        # Use the local discovery document
+        with open('mybusiness_google_rest_v4p9.json', 'r') as f:
+            discovery_service = f.read()
+
+        service = googleapiclient.discovery.build_from_document(discovery_service, credentials=credentials)
+        response = service.accounts().locations().reviews().list(parent=f'accounts/{account_id}/locations/{location_id}').execute()
+
         reviews = response.get('reviews', [])
         flask.session['credentials'] = credentials_to_dict(credentials)
+
         return flask.jsonify(reviews)
+
     except Exception as e:
         app.logger.error(f"Exception occurred: {e}")
         app.logger.exception("Exception details:")
-        return f"Error: {e}", 500
+        return flask.jsonify({"error": str(e)}), 500
 
 @app.route('/check_auth')
 def check_auth():
