@@ -188,6 +188,7 @@ def oauth2callback():
     # Store credentials in session
     credentials = flow.credentials
     flask.session['credentials'] = credentials_to_dict(credentials)
+    flask.session['access_token'] = credentials.token  # Store the access token here
 
     # Delete the state in Redis to complete the flow
     redis_client.delete('state')
@@ -236,7 +237,8 @@ def fetch_reviews():
 @app.route('/check_auth')
 def check_auth():
     if 'credentials' in flask.session:
-        return flask.jsonify({"isAuthenticated": True})
+        access_token = flask.session.get('access_token')
+        return flask.jsonify({"isAuthenticated": True, "access_token": access_token})
     else:
         return flask.jsonify({"isAuthenticated": False})
     
