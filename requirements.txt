@@ -38,6 +38,6 @@ requests-oauthlib==1.1.0
 rsa==4.9
 six==1.16.0
 uritemplate==4.1.1
-urllib3==1.26.16
+urllib3==1.26.18
 virtualenv==20.24.3
 Werkzeug==2.3.7
